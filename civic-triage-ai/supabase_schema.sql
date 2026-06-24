@@ -17,6 +17,7 @@ create table public.citizens (
     is_aadhar_verified boolean default false not null,
     state text,
     city text,
+    preferred_language text default 'en',
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -66,6 +67,12 @@ create table public.reports (
     image_url text not null,
     description text,
     
+    -- Multilingual support
+    original_language text default 'en',
+    description_translated text,
+    official_reply text,
+    official_reply_translated text,
+
     -- AI Generated Fields
     ai_category text,
     ai_severity integer,
@@ -74,9 +81,19 @@ create table public.reports (
     ai_suggested_department text,
     ai_estimated_complexity text,
     
+    -- Emergency escalation
+    is_emergency boolean default false,
+    emergency_type text,
+    emergency_notified_at timestamp with time zone,
+
     -- Status and deduplication
     status text default 'open' check (status in ('open', 'in_progress', 'resolved', 'duplicate', 'rejected')),
     merged_into_id uuid references public.reports(id),
+
+    -- Resolution (Before/After + Field Ops)
+    resolved_image_url text,
+    resolved_at timestamp with time zone,
+    field_notes text,
 
     -- PIN-code routing
     pin_code text,

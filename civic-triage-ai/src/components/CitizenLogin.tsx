@@ -13,6 +13,7 @@ export default function CitizenLogin() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
+  const [preferredLanguage, setPreferredLanguage] = useState('en');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +59,7 @@ export default function CitizenLogin() {
       }
     } else {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      const res = await registerCitizen(aadhar, password, state, city);
+      const res = await registerCitizen(aadhar, password, state, city, preferredLanguage);
       if (!res.success) {
         setError(res.error || 'Failed to register');
         setIsSubmitting(false);
@@ -144,6 +145,28 @@ export default function CitizenLogin() {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="space-y-1.5 mt-3">
+              <label className="text-sm font-medium text-slate-200">Preferred Language</label>
+              <select
+                className={selectClass}
+                value={preferredLanguage}
+                onChange={(e) => setPreferredLanguage(e.target.value)}
+              >
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="bn">Bengali</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="kn">Kannada</option>
+                <option value="ml">Malayalam</option>
+                <option value="mr">Marathi</option>
+                <option value="gu">Gujarati</option>
+                <option value="or">Odia</option>
+                <option value="pa">Punjabi</option>
+                <option value="ur">Urdu</option>
+              </select>
             </div>
           </>
         )}

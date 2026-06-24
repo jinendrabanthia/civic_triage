@@ -2,8 +2,9 @@ import { supabase } from '@/lib/supabase';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import NextLink from 'next/link';
-import { ArrowLeft, Clock, CheckCircle2, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, AlertTriangle, ShieldAlert, FileText } from 'lucide-react';
 import Image from 'next/image';
+import BeforeAfterSlider from '@/components/BeforeAfterSlider';
 
 export default async function MyReports() {
   const citizenId = (await cookies()).get('citizen_id')?.value;
@@ -11,6 +12,13 @@ export default async function MyReports() {
   if (!citizenId) {
     redirect('/');
   }
+
+  // Also get the citizen to know their preferred language
+  const { data: citizen } = await supabase
+    .from('citizens')
+    .select('preferred_language')
+    .eq('id', citizenId)
+    .single();
 
   const { data: reports, error } = await supabase
     .from('reports')
@@ -66,16 +74,22 @@ export default async function MyReports() {
           <div className="grid gap-6">
             {reports.map((report) => (
               <div key={report.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row gap-6 hover:border-slate-700 transition-colors">
-                <div className="relative w-full md:w-48 h-32 flex-shrink-0 bg-slate-800 rounded-xl overflow-hidden">
-                  <Image 
-                    src={report.image_url} 
-                    alt="Issue image" 
-                    fill 
-                    className="object-cover"
-                    unoptimized 
-                  />
+                {/* Image Section (Static or Slider) */}
+                <div className="relative w-full md:w-64 h-48 flex-shrink-0 bg-slate-800 rounded-xl overflow-hidden">
+                  {report.status === 'resolved' && report.resolved_image_url ? (
+                    <BeforeAfterSlider beforeUrl={report.image_url} afterUrl={report.resolved_image_url} />
+                  ) : (
+                    <Image 
+                      src={report.image_url} 
+                      alt="Issue image" 
+                      fill 
+                      className="object-cover"
+                      unoptimized 
+                    />
+                  )}
                 </div>
                 
+                {/* Details Section */}
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2">
@@ -90,6 +104,20 @@ export default async function MyReports() {
                     
                     <h3 className="text-xl font-semibold mb-2">{report.ai_category || 'Uncategorized Issue'}</h3>
                     <p className="text-slate-400 text-sm line-clamp-2 mb-4">{report.description}</p>
+
+                    {/* Official Reply Section */}
+                    {(report.official_reply || report.official_reply_translated) && (
+                      <div className="bg-slate-800/50 border border-slate-700 p-4 rounded-xl mb-4">
+                        <div className="flex items-center gap-2 mb-1 text-sm font-semibold text-blue-400">
+                          <FileText size={16} /> Official Response
+                        </div>
+                        <p className="text-slate-300 text-sm">
+                          {report.original_language && report.original_language !== 'en' && report.official_reply_translated 
+                            ? report.official_reply_translated 
+                            : report.official_reply}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex gap-2">

@@ -12,7 +12,8 @@ export async function registerCitizen(
   aadharNumber: string,
   passwordStr: string,
   state: string,
-  city: string
+  city: string,
+  preferredLanguage: string = 'en'
 ) {
   if (!aadharNumber || aadharNumber.trim().length !== 12 || isNaN(Number(aadharNumber))) {
     return { success: false, error: 'A valid 12-digit Aadhar number is required' };
@@ -46,6 +47,7 @@ export async function registerCitizen(
         is_aadhar_verified: true,
         state,
         city,
+        preferred_language: preferredLanguage,
       }])
       .select()
       .single();

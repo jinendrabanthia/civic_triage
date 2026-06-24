@@ -1,7 +1,5 @@
 import { GoogleGenAI, Type, Schema } from '@google/genai';
 
-// Initialize the Google Gen AI SDK
-// Note: It automatically picks up the GEMINI_API_KEY environment variable.
 const ai = new GoogleGenAI({});
 
 export const responseSchema: Schema = {
@@ -36,6 +34,15 @@ export const responseSchema: Schema = {
     is_prank_or_unrelated: {
       type: Type.BOOLEAN,
       description: "True if the image does not depict a public infrastructure issue (e.g., a cat, a selfie)."
+    },
+    is_emergency_hazard: {
+      type: Type.BOOLEAN,
+      description: "True ONLY if the issue poses an immediate life-threatening danger: exposed live wires, gas leaks, deep sinkholes, structural collapse, flooding, chemical spills."
+    },
+    emergency_type: {
+      type: Type.STRING,
+      enum: ["electrical", "gas_leak", "structural", "flooding", "sinkhole", "chemical", "none"],
+      description: "The type of emergency hazard, or 'none' if not an emergency."
     }
   },
   required: [
@@ -45,12 +52,27 @@ export const responseSchema: Schema = {
     "justification_for_severity",
     "suggested_city_department",
     "estimated_fix_complexity",
-    "is_prank_or_unrelated"
+    "is_prank_or_unrelated",
+    "is_emergency_hazard",
+    "emergency_type"
   ]
 };
 
 export async function analyzeReportImage(base64Image: string, mimeType: string) {
-  const prompt = `You are an expert civil engineer and municipal triage AI. Look at the attached image/video. Respond STRICTLY in this JSON schema, and nothing else.`;
+  const prompt = `You are an expert civil engineer and municipal triage AI. Analyze the attached image carefully.
+
+CRITICAL SAFETY CHECK: First, determine if this is an EMERGENCY HAZARD that poses immediate life-threatening danger. Examples:
+- Exposed live electrical wires or downed power lines
+- Gas leaks or chemical spills
+- Deep sinkholes that could swallow pedestrians or vehicles
+- Structural collapse of buildings or bridges
+- Active flooding threatening lives or property
+
+If any of these are detected, set is_emergency_hazard to true and classify the emergency_type.
+
+Then perform standard triage: categorize the issue, score severity (1-100), suggest the department, and estimate fix complexity.
+
+Respond STRICTLY in the JSON schema provided.`;
   
   try {
     const response = await ai.models.generateContent({
@@ -81,7 +103,6 @@ export async function analyzeReportImage(base64Image: string, mimeType: string) 
     return null;
   } catch (error) {
     console.error("Gemini API Error:", error);
-    // Fallback for demo stability
     return {
       issue_category: "Hazard",
       confidence_score: 0.85,
@@ -89,7 +110,9 @@ export async function analyzeReportImage(base64Image: string, mimeType: string) 
       justification_for_severity: "Fallback triggered: Automated assessment unavailable.",
       suggested_city_department: "General Services",
       estimated_fix_complexity: "Standard Crew",
-      is_prank_or_unrelated: false
+      is_prank_or_unrelated: false,
+      is_emergency_hazard: false,
+      emergency_type: "none"
     };
   }
 }
