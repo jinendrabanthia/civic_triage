@@ -240,6 +240,7 @@ values (
   'Maharashtra',
   'Mumbai',
   'seeded-admin',
+  'approved'
 ) on conflict (email) do nothing;
 
 -- ============================================================
