@@ -33,7 +33,7 @@ CivicTriage AI is a modern, AI-powered platform for reporting, triaging, and res
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/jinendrabanthia/civic_triage.git
-cd civic_triage/civic-triage-ai
+cd civic_triage
 ```
 
 ### 2. Install Dependencies
