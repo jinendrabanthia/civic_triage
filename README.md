@@ -1,6 +1,6 @@
-# CivicTriage AI
+# Nagar Drishti AI
 
-CivicTriage AI is a modern, AI-powered platform for reporting, triaging, and resolving city infrastructure issues. Built for GovTech, it leverages Google's Gemini AI to instantly analyze citizen reports, score their severity, and route them to the appropriate city department—saving thousands of hours of manual triage time.
+Nagar Drishti AI is a modern, AI-powered platform for reporting, triaging, and resolving city infrastructure issues. Built for GovTech, it leverages Google's Gemini AI to instantly analyze citizen reports, score their severity, and route them to the appropriate city department—saving thousands of hours of manual triage time.
 
 ## 🌟 Features
 
@@ -32,8 +32,8 @@ CivicTriage AI is a modern, AI-powered platform for reporting, triaging, and res
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/jinendrabanthia/civic_triage.git
-cd civic_triage
+git clone https://github.com/jinendrabanthia/nagar_drishti.git
+cd nagar_drishti
 ```
 
 ### 2. Install Dependencies
